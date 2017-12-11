@@ -1,11 +1,19 @@
 package main
 
 import (
-	"fmt"
-	"math/rand"
+	"bytes"
 	"os"
-	"time"
 )
+
+func main() {
+	instances := ReadSCInstancesFromFile("cutting_instances_with_solutions.txt")
+
+	instances[1].RandomSearch(100000)
+
+	//CLONALG(instances[0], 20, 10, 5, 2000)
+
+	ACO(instances[1], 100000, 0.5, 100, 1, 5)
+}
 
 // SCInstance represents a stock cutting problem instance
 type SCInstance struct {
@@ -13,46 +21,6 @@ type SCInstance struct {
 	StockCosts      []int
 	OrderLengths    []int
 	OrderQuantities []int
-}
-
-// SCSolution represents a stock cutting problem solution
-type SCSolution struct {
-	Instance *SCInstance
-	Lengths  [][][]int
-	Cost     int
-}
-
-func main() {
-	fmt.Printf("todo\n")
-	instances := ReadSCInstancesFromFile("cutting_instances_with_solutions.txt")
-
-	instances[0].RandomSearch(30000)
-}
-
-// RandomSearch performs a random search on the given stock cutting instance
-func (instance SCInstance) RandomSearch(steps int) {
-	var newSolution SCSolution
-	bestSolution := instance.GenerateRandomSolution()
-
-	for i := 0; i < steps; i++ {
-		//for bestSolution.Cost > 5000 {
-		newSolution = instance.GenerateRandomSolution()
-		fmt.Print(newSolution)
-
-		if newSolution.Cost < bestSolution.Cost {
-			bestSolution = newSolution
-			fmt.Print(" << NEW BEST")
-		}
-
-		fmt.Println()
-	}
-
-	fmt.Println()
-	fmt.Println("~~~")
-	fmt.Print("Best solution: ")
-	fmt.Println(bestSolution)
-	fmt.Println("~~~")
-	fmt.Println()
 }
 
 // ReadSCInstancesFromFile returns a SCInstance from the given file
@@ -76,72 +44,48 @@ func ReadSCInstancesFromFile(file string) []SCInstance {
 			OrderQuantities: []int{2, 4, 4, 15, 6, 11, 6, 15, 13, 5, 2, 9, 3, 6, 10, 4, 8, 3}}}
 }
 
-// GenerateRandomSolution returns a random stock cutting problem solution for the given instance
-func (instance SCInstance) GenerateRandomSolution() SCSolution {
-	// seed randomness
-	rand.Seed(int64(time.Now().Nanosecond()))
-
-	// initialize solution Lengths 3D array
-	solution := SCSolution{Instance: &instance}
-	solution.Lengths = make([][][]int, len(instance.StockLengths))
-	for i := 0; i < len(solution.Lengths); i++ {
-		solution.Lengths[i] = make([][]int, 1)
-	}
-
-	// construct a slice of ordered lengths and shuffle it
-	orders := []int{}
-	for i := 0; i < len(instance.OrderLengths); i++ {
-		for j := 0; j < instance.OrderQuantities[i]; j++ {
-			orders = append(orders, instance.OrderLengths[i])
-		}
-	}
-	shuffledOrders := make([]int, len(orders))
-	perm := rand.Perm(len(orders))
-	for i, v := range perm {
-		shuffledOrders[v] = orders[i]
-	}
-
-	// put the ordered lengths into random stocks that they will fit in
-	for orderIndex := range shuffledOrders {
-		// randomly select a stock length
-		stockIndex := rand.Intn(len(instance.StockLengths))
-		for instance.StockLengths[stockIndex] < shuffledOrders[orderIndex] {
-			stockIndex = rand.Intn(len(instance.StockLengths))
-		}
-
-		endBinIndex := len(solution.Lengths[stockIndex]) - 1
-		endBinSum := 0
-
-		for i := range solution.Lengths[stockIndex][endBinIndex] {
-			endBinSum += solution.Lengths[stockIndex][endBinIndex][i]
-		}
-
-		if endBinSum+shuffledOrders[orderIndex] > instance.StockLengths[stockIndex] {
-			endBinIndex++
-			solution.Lengths[stockIndex] = append(solution.Lengths[stockIndex], make([]int, 0))
-		}
-
-		solution.Lengths[stockIndex][endBinIndex] = append(solution.Lengths[stockIndex][endBinIndex], shuffledOrders[orderIndex])
-	}
-
-	// set the solution Cost
-	solution.Cost = solution.GetCost()
-
-	return solution
+// SCSolution represents a stock cutting problem solution
+type SCSolution struct {
+	Instance          *SCInstance
+	Lengths           [][]int
+	Cost              int
+	NormalisedFitness float64
 }
 
 // GetCost returns the cost of a solution
 func (solution *SCSolution) GetCost() int {
 	cost := 0
 
-	for i := 0; i < len(solution.Lengths); i++ {
-		for j := 0; j < len(solution.Lengths[i]); j++ {
-			// for k := 0; k < len(solution.Lengths[i][j]); k++ {
-			// 	//
-			// }
+	for i := range solution.Lengths {
+		count := 0
+
+		for j := range solution.Lengths[i] {
+			count += solution.Lengths[i][j]
+
+			if count > solution.Instance.StockLengths[i] {
+				cost += solution.Instance.StockCosts[i]
+				count = solution.Lengths[i][j]
+			}
+		}
+
+		if count > 0 {
 			cost += solution.Instance.StockCosts[i]
 		}
 	}
 
 	return cost
+}
+
+func (solution *SCSolution) String() string {
+	var buffer bytes.Buffer
+
+	for i := range solution.Lengths {
+		for j := range solution.Lengths[i] {
+			buffer.WriteString(string(solution.Lengths[i][j]))
+			buffer.WriteString(",")
+		}
+		buffer.WriteString(";")
+	}
+
+	return buffer.String()
 }
