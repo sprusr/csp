@@ -1,7 +1,6 @@
-package main
+package csp
 
 import (
-	"fmt"
 	"math"
 	"math/rand"
 	"time"
@@ -14,7 +13,7 @@ func ACO(instance SCInstance, searchTime float64, evaporation float64, depositio
 	bestSolution := instance.GenerateRandomSolution()
 
 	// initialise pheremones
-	initialPheremone := 0.2
+	initialPheremone := 1.0
 	pheremones := make(map[[3]int]float64)
 	for i := 0; i < len(instance.StockLengths); i++ {
 		for j := 0; j < len(instance.OrderLengths); j++ {
@@ -69,35 +68,22 @@ func ACO(instance SCInstance, searchTime float64, evaporation float64, depositio
 				}
 			}
 
-			// sort.Sort(byPotential(potentials))
-			//
-			// // pick the best option
-			// orders[potentials[0].OrderIndex]--
-			// solution.Lengths[potentials[0].StockIndex] = append(solution.Lengths[potentials[0].StockIndex], instance.OrderLengths[potentials[0].OrderIndex])
-
-			// shuffle potentials
-			shuffled := make([]potential, len(potentials))
-			perm := rand.Perm(len(potentials))
-			for i, v := range perm {
-				shuffled[v] = potentials[i]
-			}
-
 			// set probabilistic stuff
-			for i := range shuffled {
-				shuffled[i].Probability = math.Pow(shuffled[i].Pheremone, pheremoneImportance) * math.Pow(1/float64(instance.OrderLengths[shuffled[i].OrderIndex]), costImportance)
+			for i := range potentials {
+				potentials[i].Probability = math.Pow(potentials[i].Pheremone, pheremoneImportance) * math.Pow(1/float64(instance.OrderLengths[potentials[i].OrderIndex]), costImportance)
 			}
-			for i := 1; i < len(shuffled); i++ {
-				shuffled[i].Probability = shuffled[i].Probability + shuffled[i-1].Probability
-				//fmt.Println(shuffled[i].Probability)
+			for i := 1; i < len(potentials); i++ {
+				potentials[i].Probability = potentials[i].Probability + potentials[i-1].Probability
+				//fmt.Println(potentials[i].Probability)
 			}
 
 			// choose what to do
-			r := rand.Float64() * shuffled[len(shuffled)-1].Probability
-			for i := range shuffled {
-				if shuffled[i].Probability >= r {
+			r := rand.Float64() * potentials[len(potentials)-1].Probability
+			for i := range potentials {
+				if potentials[i].Probability >= r {
 					//fmt.Println(i, r)
-					orders[shuffled[i].OrderIndex]--
-					solution.Lengths[shuffled[i].StockIndex] = append(solution.Lengths[shuffled[i].StockIndex], instance.OrderLengths[shuffled[i].OrderIndex])
+					orders[potentials[i].OrderIndex]--
+					solution.Lengths[potentials[i].StockIndex] = append(solution.Lengths[potentials[i].StockIndex], instance.OrderLengths[potentials[i].OrderIndex])
 					break
 				}
 			}
@@ -107,7 +93,6 @@ func ACO(instance SCInstance, searchTime float64, evaporation float64, depositio
 
 		if solution.Cost < bestSolution.Cost {
 			bestSolution = solution
-			// fmt.Println(solution)
 		}
 
 		// update pheremones
@@ -123,14 +108,6 @@ func ACO(instance SCInstance, searchTime float64, evaporation float64, depositio
 				}
 			}
 		}
-		// for i := range solution.Lengths {
-		// 	if len(solution.Lengths[i]) > 0 {
-		// 		pheremones[[3]int{i, 0, solution.Lengths[i][0]}] = pheremones[[3]int{i, 0, solution.Lengths[i][0]}] * (deposition / float64(solution.Cost))
-		// 	}
-		// 	for j := 0; j < len(solution.Lengths[i])-1; j++ {
-		// 		pheremones[[3]int{i, solution.Lengths[i][j], solution.Lengths[i][j+1]}] = pheremones[[3]int{i, solution.Lengths[i][j], solution.Lengths[i][j+1]}] * (deposition / float64(solution.Cost))
-		// 	}
-		// }
 
 		// decay pheremones
 		for i := 0; i < len(instance.StockLengths); i++ {
@@ -143,8 +120,6 @@ func ACO(instance SCInstance, searchTime float64, evaporation float64, depositio
 			}
 		}
 	}
-
-	fmt.Printf("\n~~~\nBest route: %v\nCost: %v\n~~~\n", bestSolution.Lengths, bestSolution.Cost)
 
 	return bestSolution
 }
@@ -164,5 +139,5 @@ func (s byPotential) Swap(i, j int) {
 	s[i], s[j] = s[j], s[i]
 }
 func (s byPotential) Less(i, j int) bool {
-	return s[i].Pheremone < s[j].Pheremone
+	return s[i].Pheremone > s[j].Pheremone
 }

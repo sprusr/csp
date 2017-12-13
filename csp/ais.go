@@ -1,7 +1,6 @@
-package main
+package csp
 
 import (
-	"fmt"
 	"math/rand"
 	"sort"
 	"time"
@@ -63,8 +62,6 @@ func CLONALG(instance SCInstance, searchTime float64, populationSize int, replac
 		// }
 		// fmt.Println()
 	}
-
-	fmt.Printf("\n~~~\nBest route: %v\nCost: %v\n~~~\n", bestSolution.Lengths, bestSolution.Cost)
 
 	return bestSolution
 }
