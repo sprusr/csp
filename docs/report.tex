@@ -31,13 +31,13 @@
 
   \subsection{Artificial Immune System}
 
-  The AIS immune system approach is inspired by the human immune system. Specifically, the Clonal Selection algorithm (CLONALG) applies the theory that white blood cells improve their ability to counter alien cells over time, as they are exposed to them. In the case of the CSP, the algorithm improves its ability to produce more optimal solutions as it discovers them.
+    The AIS immune system approach is inspired by the human immune system. Specifically, the Clonal Selection algorithm (CLONALG) applies the theory that white blood cells improve their ability to counter alien cells over time, as they are exposed to them. In the case of the CSP, the algorithm improves its ability to produce more optimal solutions as it discovers them.
 
-  It does this through a method of cloning, mutation, and selection. From an initial population of a specified size, a clone pool is created by "copying" the existing population x-number of times (a parameter to the algorithm). The pool is then mutated through some process. In this implementation, the mutation function selects a random neighbour from the solution's two-opt neighbourhood.
+    It does this through a method of cloning, mutation, and selection. From an initial population of a specified size, a clone pool is created by "copying" the existing population x-number of times (a parameter to the algorithm). The pool is then mutated through some process. In this implementation, the mutation function selects a random neighbour from the solution's two-opt neighbourhood.
 
-  The mutated pool is then added back to the main population, at which point the selection process takes place. This decides which of the population are kept for the next generation, up to a defined number. A simple greedy method of selection has been used in this instance.
+    The mutated pool is then added back to the main population, at which point the selection process takes place. This decides which of the population are kept for the next generation, up to a defined number. A simple greedy method of selection has been used in this instance.
 
-  Finally, a form of metadynamics are performed on the population - the lowest n-number of the populus are replaced by random solutions. Additionally, the "age" of each solution in the population is incremented, until reaching the defined maximum age, at which point is it removed from the population. Both of these methods prevent the algorithm from reaching "stale" solutions, or local minima. By ensuring this degree of randomness, we are guaranteed to eventually reach the optimal solution for a given problem instance.
+    Finally, a form of metadynamics are performed on the population - the lowest n-number of the populus are replaced by random solutions. Additionally, the "age" of each solution in the population is incremented, until reaching the defined maximum age, at which point is it removed from the population. Both of these methods prevent the algorithm from reaching "stale" solutions, or local minima. By ensuring this degree of randomness, we are guaranteed to eventually reach the optimal solution for a given problem instance.
 
   \subsection{Ant Colony Optimisation}
 
