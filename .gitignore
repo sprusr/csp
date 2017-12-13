@@ -1,0 +1,11 @@
+# mac trashes
+.DS_Store
+
+# tex
+*.aux
+*.log
+*.pdf
+*.bbl
+*.bcf
+*.blg
+*.run.xml

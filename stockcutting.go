@@ -2,17 +2,28 @@ package main
 
 import (
 	"bytes"
+	"fmt"
+	"math/rand"
 	"os"
+	"sort"
+	"strconv"
+	"time"
 )
 
 func main() {
 	instances := ReadSCInstancesFromFile("cutting_instances_with_solutions.txt")
+	instance := instances[0]
+	time := float64(800)
 
-	instances[1].RandomSearch(100000)
+	// RandomSearch(instance, time)
+	// CLONALG(instance, time, 20, 10, 5, 100)
+	// ACO(instance, time, 0.5, 10, 1, 5)
 
-	//CLONALG(instances[0], 20, 10, 5, 2000)
-
-	ACO(instances[1], 100000, 0.5, 100, 1, 5)
+	avg := 0
+	for i := 0; i < 40; i++ {
+		avg = ((avg * i) + CLONALG(instance, time, 20, 10, 5, 100).Cost) / (i + 1)
+	}
+	fmt.Println(avg)
 }
 
 // SCInstance represents a stock cutting problem instance
@@ -46,10 +57,11 @@ func ReadSCInstancesFromFile(file string) []SCInstance {
 
 // SCSolution represents a stock cutting problem solution
 type SCSolution struct {
-	Instance          *SCInstance
-	Lengths           [][]int
-	Cost              int
-	NormalisedFitness float64
+	Instance *SCInstance
+	Lengths  [][]int
+	Cost     int
+	Age      int
+	Str      string
 }
 
 // GetCost returns the cost of a solution
@@ -80,12 +92,78 @@ func (solution *SCSolution) String() string {
 	var buffer bytes.Buffer
 
 	for i := range solution.Lengths {
+		sort.Ints(solution.Lengths[i])
 		for j := range solution.Lengths[i] {
-			buffer.WriteString(string(solution.Lengths[i][j]))
+			buffer.WriteString(strconv.Itoa(solution.Lengths[i][j]))
 			buffer.WriteString(",")
 		}
 		buffer.WriteString(";")
 	}
 
+	solution.Str = buffer.String()
+
 	return buffer.String()
+}
+
+// GenerateRandomSolution returns a random stock cutting problem solution for the given instance
+func (instance SCInstance) GenerateRandomSolution() SCSolution {
+	// initialize solution lengths 2D slice
+	solution := SCSolution{Instance: &instance}
+	solution.Lengths = make([][]int, len(instance.StockLengths))
+	for i := 0; i < len(solution.Lengths); i++ {
+		solution.Lengths[i] = make([]int, 0)
+	}
+
+	// construct a slice of ordered lengths and shuffle it
+	orders := []int{}
+	for i := 0; i < len(instance.OrderLengths); i++ {
+		for j := 0; j < instance.OrderQuantities[i]; j++ {
+			orders = append(orders, instance.OrderLengths[i])
+		}
+	}
+	shuffledOrders := make([]int, len(orders))
+	perm := rand.Perm(len(orders))
+	for i, v := range perm {
+		shuffledOrders[v] = orders[i]
+	}
+
+	// put the ordered lengths into random stocks that fit them
+	for orderIndex := range shuffledOrders {
+		stockIndex := rand.Intn(len(instance.StockLengths))
+		for instance.StockLengths[stockIndex] < shuffledOrders[orderIndex] {
+			stockIndex = rand.Intn(len(instance.StockLengths))
+		}
+		solution.Lengths[stockIndex] = append(solution.Lengths[stockIndex], shuffledOrders[orderIndex])
+	}
+
+	// set the solution Cost
+	solution.Cost = solution.GetCost()
+
+	return solution
+}
+
+// RandomSearch performs a random search on the given stock cutting instance
+func RandomSearch(instance SCInstance, searchTime float64) SCSolution {
+	rand.Seed(int64(time.Now().Nanosecond()))
+
+	var newSolution SCSolution
+	bestSolution := instance.GenerateRandomSolution()
+
+	// startTime := time.Now()
+	// endTime := startTime.UnixNano() + int64(searchTime*1000000000)
+
+	for i := 0; i < int(searchTime); i++ {
+		//for time.Now().UnixNano() < endTime {
+		//for bestSolution.Cost > 5000 {
+		newSolution = instance.GenerateRandomSolution()
+
+		if newSolution.Cost < bestSolution.Cost {
+			bestSolution = newSolution
+			// fmt.Println(newSolution)
+		}
+	}
+
+	fmt.Printf("\n~~~\nBest route: %v\nCost: %v\n~~~\n", bestSolution.Lengths, bestSolution.Cost)
+
+	return bestSolution
 }
