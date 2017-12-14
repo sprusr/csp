@@ -13,17 +13,14 @@ func init() {
 
 var randomCmd = &cobra.Command{
 	Use:   "random",
-	Short: "Perform the ACO algorithm",
-	Long:  "For the given instance, execute the Ant Colony Optimisation algorithm.",
+	Short: "Perform a random search",
+	Long:  "For the given instance, execute a random search.",
 	Run: func(cmd *cobra.Command, args []string) {
 		instances := csp.GetSCInstances()
 		time := float64(iterations)
-		// solution := csp.RandomSearch(instances[instance], time)
-		// fmt.Printf("\n~~~\nBest route: %v\nCost: %v\n~~~\n", solution.Lengths, solution.Cost)
-		avg := 0.0
 		for i := 0; i < runs; i++ {
-			avg = ((avg * float64(i)) + csp.RandomSearch(instances[instance], time).Cost) / (float64(i) + 1)
+			solution := csp.RandomSearch(instances[instance], time)
+			fmt.Println(solution.Cost)
 		}
-		fmt.Printf("Random best: %v\n", avg)
 	},
 }

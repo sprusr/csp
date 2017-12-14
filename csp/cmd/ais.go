@@ -22,6 +22,5 @@ var aisCmd = &cobra.Command{
 			solution := csp.CLONALG(instances[instance], time, 20, 10, 5, 100)
 			fmt.Println(solution.Cost)
 		}
-		//fmt.Printf("\n~~~\nBest route: %v\nCost: %v\n~~~\n", solution.Lengths, solution.Cost)
 	},
 }

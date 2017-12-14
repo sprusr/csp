@@ -22,6 +22,5 @@ var acoCmd = &cobra.Command{
 			solution := csp.ACO(instances[instance], time, 0.5, 10, 1, 5)
 			fmt.Println(solution.Cost)
 		}
-		//fmt.Printf("\n~~~\nBest route: %v\nCost: %v\n~~~\n", solution.Lengths, solution.Cost)
 	},
 }
