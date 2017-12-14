@@ -123,7 +123,7 @@
             ymin=2000, ymax=2300,
             xtick={1,5,10,20,40,80},
             ytick={2000,2050,2100,2150,2200,2250,2300},
-            legend pos=north west,
+            legend pos=north east,
             ymajorgrids=true,
             grid style=dashed,
         ]
@@ -135,6 +135,7 @@
               coordinates {
               (1,2269)(5,2253)(10,2215)(20,2163)(40,2129)(80,2114)
               };
+          \addlegendentry{ACO}
 
           \addplot[
               color=red,
@@ -143,6 +144,7 @@
               coordinates {
               (1,2214)(5,2182)(10,2159)(20,2120)(40,2076)(80,2024)
               };
+          \addlegendentry{AIS}
 
           \addplot[
               color=green,
@@ -151,6 +153,7 @@
               coordinates {
               (1,2267)(5,2246)(10,2238)(20,2224)(40,2218)(80,2208)
               };
+          \addlegendentry{Random}
 
         \end{axis}
       \end{tikzpicture}
