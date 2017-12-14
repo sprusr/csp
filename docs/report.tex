@@ -67,7 +67,7 @@
 
     \bigskip
 
-    Unfortunately, the results from my ACO implementation were not as good as I had hoped. It was in fact found to produce only marginally better results than a random search algorithm for the most part.
+    Unfortunately, the results from my ACO implementation were not as good as I had hoped, especially when compared with those of the AIS algorithm, as seen in the following section.
 
 \section{Comparison of Algorithms}
 
@@ -96,11 +96,11 @@
       \hline
       Runs    & 1     & 5     & 10    & 20    & 40    & 80             \\
       \hline
-      ACO     & 5533  & 5446  & 5428  & 5362  & 5278  & -              \\
+      ACO     & 5533  & 5446  & 5428  & 5362  & 5278  & 5106           \\
       \hline
       CLONALG & 5175  & 5044  & 4926  & 4804  & 4660  & 4542           \\
       \hline
-      Random  & -     & -     & -     & -     & -     & -              \\
+      Random  & 5446  & 5357  & 5283  & 5257  & 5234  & 5186           \\
       \hline
     \end{tabularx}
     \caption{Average results of different numbers of iterations over 40 algorithm runs on CSP instance 2.}
@@ -116,13 +116,13 @@
     \begin{center}
       \begin{tikzpicture}
         \begin{axis}[
-            title={CLONALG Algorithm Performance on Problem 2 (Avg. over 40 runs)},
+            title={Algorithm Performance on Problem 3 (Avg. over 40 runs)},
             xlabel={Iterations},
             ylabel={Best Solution Cost},
             xmin=1, xmax=80,
-            ymin=4400, ymax=5200,
+            ymin=2000, ymax=2300,
             xtick={1,5,10,20,40,80},
-            ytick={4400,4600,4800,5000,5200},
+            ytick={2000,2050,2100,2150,2200,2250,2300},
             legend pos=north west,
             ymajorgrids=true,
             grid style=dashed,
@@ -133,15 +133,30 @@
               mark=square,
               ]
               coordinates {
-              (1,5175)(5,5044)(10,4926)(20,4804)(40,4660)(80,4542)
+              (1,2269)(5,2253)(10,2215)(20,2163)(40,2129)(80,2114)
+              };
+
+          \addplot[
+              color=red,
+              mark=square,
+              ]
+              coordinates {
+              (1,2214)(5,2182)(10,2159)(20,2120)(40,2076)(80,2024)
+              };
+
+          \addplot[
+              color=green,
+              mark=square,
+              ]
+              coordinates {
+              (1,2267)(5,2246)(10,2238)(20,2224)(40,2218)(80,2208)
               };
 
         \end{axis}
       \end{tikzpicture}
+      \caption{Comparison of the two algorithms vs random search.}
     \end{center}
   \end{figure}
-
-  \bigskip
 
 \bibliography{report}
 \bibliographystyle{plain}
