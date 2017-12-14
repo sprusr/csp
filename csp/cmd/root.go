@@ -7,10 +7,12 @@ import (
 func init() {
 	rootCmd.PersistentFlags().IntVarP(&iterations, "iterations", "i", 40, "number of algorithm iterations")
 	rootCmd.PersistentFlags().IntVarP(&instance, "instance", "I", 0, "instance on which to operate")
+	rootCmd.PersistentFlags().IntVarP(&runs, "runs", "r", 40, "number of algorithm runs")
 }
 
 var iterations int
 var instance int
+var runs int
 
 var rootCmd = &cobra.Command{
 	Use:   "csp",

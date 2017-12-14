@@ -8,11 +8,8 @@ import (
 )
 
 func init() {
-	compareCmd.Flags().IntVarP(&runs, "runs", "r", 40, "number of runs to average over")
 	rootCmd.AddCommand(compareCmd)
 }
-
-var runs int
 
 var compareCmd = &cobra.Command{
 	Use:   "compare",

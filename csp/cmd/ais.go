@@ -17,8 +17,11 @@ var aisCmd = &cobra.Command{
 	Long:  "For the given instance, execute the CLONALG Artificial Immune System algorithm.",
 	Run: func(cmd *cobra.Command, args []string) {
 		instances := csp.GetSCInstances()
-		time := float64(100)
-		solution := csp.CLONALG(instances[2], time, 20, 10, 5, 100)
-		fmt.Printf("\n~~~\nBest route: %v\nCost: %v\n~~~\n", solution.Lengths, solution.Cost)
+		time := float64(iterations)
+		for i := 0; i < runs; i++ {
+			solution := csp.CLONALG(instances[instance], time, 20, 10, 5, 100)
+			fmt.Println(solution.Cost)
+		}
+		//fmt.Printf("\n~~~\nBest route: %v\nCost: %v\n~~~\n", solution.Lengths, solution.Cost)
 	},
 }
